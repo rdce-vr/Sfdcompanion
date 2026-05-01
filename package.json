@@ -1,11 +1,13 @@
 {
-  "name": "@figma/my-make-file",
+  "name": "sfd-delivery-tracker",
   "private": true,
-  "version": "0.0.1",
+  "version": "1.0.0",
   "type": "module",
+  "description": "SFD Delivery Earnings Tracker - PWA for tracking Shopee Food Driver deliveries",
   "scripts": {
+    "dev": "vite",
     "build": "vite build",
-    "dev": "vite"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",

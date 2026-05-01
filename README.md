@@ -17,23 +17,48 @@ A Progressive Web App (PWA) for tracking Shopee Food Driver delivery earnings, t
 ### Using Docker Compose (Recommended)
 
 ```bash
-# Build and run
-docker-compose up -d
+# Build and start
+docker-compose up -d --build
 
-# Access the app at http://localhost:3000
+# View logs
+docker-compose logs -f
+
+# Stop
+docker-compose down
+
+# Access at http://localhost:3000
 ```
 
 ### Manual Installation
 
 ```bash
+# Install pnpm (if not installed)
+npm install -g pnpm
+
 # Install dependencies
 pnpm install
 
-# Start development server
+# Development
 pnpm run dev
 
 # Build for production
 pnpm run build
+
+# Preview production build
+pnpm run preview
+```
+
+## Docker Commands
+
+```bash
+# Build image only
+docker build -t sfd-tracker .
+
+# Run container
+docker run -d -p 3000:80 --name sfd-tracker sfd-tracker
+
+# Stop and remove
+docker stop sfd-tracker && docker rm sfd-tracker
 ```
 
 ## How to Use

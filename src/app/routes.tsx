@@ -18,10 +18,6 @@ export const router = createBrowserRouter([
     Component: EntriesList,
   },
   {
-    path: "/entry/new",
-    Component: EntryDetail,
-  },
-  {
     path: "/entry/:id",
     Component: EntryDetail,
   },
