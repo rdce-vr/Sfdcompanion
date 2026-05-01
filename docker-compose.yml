@@ -6,8 +6,8 @@ services:
       - "5173:5173"
     volumes:
       - .:/app
-      - /app/node_modules
     environment:
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true
-    command: npm run dev -- --host
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
