@@ -173,10 +173,10 @@ export function EntryDetail() {
             {!hasSeparateTip && (
               <button
                 onClick={() => setHasSeparateTip(true)}
-                className="px-3 py-1 bg-orange-600 hover:bg-orange-700 rounded-lg transition-colors flex items-center gap-1 text-sm"
+                className="w-12 h-12 bg-orange-600 hover:bg-orange-700 rounded-full transition-colors flex items-center justify-center shadow-lg active:scale-95"
+                aria-label="Add Tip"
               >
-                <Plus size={16} />
-                <span>Add Tip</span>
+                <Plus size={24} strokeWidth={3} />
               </button>
             )}
           </div>

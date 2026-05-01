@@ -1,7 +1,13 @@
+version: '3.8'
+
 services:
-  app:
-    image: shopeecomp:0.1
-    container_name: sfdcompanion
+  sfd-tracker:
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "5173:5173"
+      - "3000:80"
+    container_name: sfd-delivery-tracker
     restart: unless-stopped
+    environment:
+      - NODE_ENV=production

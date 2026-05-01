@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { Calculator, RotateCcw, Fuel, ListOrdered, Plus } from 'lucide-react';
-import { getEntries, getFuelData, saveFuelData, resetAll } from '../utils/storage';
+import { Calculator, RotateCcw, Fuel, ListOrdered, Plus, Wallet, Banknote, Gift, Save } from 'lucide-react';
+import { getEntries, getFuelData, saveFuelData, resetAll, addEntry } from '../utils/storage';
 import { calculateSessionTotals } from '../utils/calculations';
 import { FuelData } from '../types';
 
@@ -9,6 +9,15 @@ export function Home() {
   const navigate = useNavigate();
   const [entries, setEntries] = useState(getEntries());
   const [fuel, setFuel] = useState<FuelData>(getFuelData());
+
+  // Entry form state
+  const [spayIncome, setSpayIncome] = useState('');
+  const [hasCashPayment, setHasCashPayment] = useState(false);
+  const [customerOwe, setCustomerOwe] = useState('');
+  const [customerPaid, setCustomerPaid] = useState('');
+  const [hasSeparateTip, setHasSeparateTip] = useState(false);
+  const [separateTipAmount, setSeparateTipAmount] = useState('');
+  const [separateTipType, setSeparateTipType] = useState<'cash' | 'spay'>('cash');
 
   useEffect(() => {
     const handleStorage = () => {
@@ -19,21 +28,48 @@ export function Home() {
     return () => window.removeEventListener('storage-update', handleStorage);
   }, []);
 
-  const updateFuel = (updates: Partial<FuelData>) => {
-    const newFuel = { ...fuel, ...updates };
-    setFuel(newFuel);
-    saveFuelData(newFuel);
-  };
-
   const handleReset = () => {
     if (confirm('Reset all data? This will clear all entries and fuel data.')) {
       resetAll();
       setEntries([]);
       setFuel({ costPerLitre: 0, distance: 0, kmPerL: 0 });
+      clearForm();
     }
   };
 
+  const clearForm = () => {
+    setSpayIncome('');
+    setHasCashPayment(false);
+    setCustomerOwe('');
+    setCustomerPaid('');
+    setHasSeparateTip(false);
+    setSeparateTipAmount('');
+    setSeparateTipType('cash');
+  };
+
+  const handleSaveEntry = () => {
+    const entryData = {
+      id: Date.now().toString(),
+      spayIncome: parseFloat(spayIncome) || 0,
+      hasCashPayment,
+      customerOwe: parseFloat(customerOwe) || 0,
+      customerPaid: parseFloat(customerPaid) || 0,
+      hasSeparateTip,
+      separateTipAmount: parseFloat(separateTipAmount) || 0,
+      separateTipType,
+      timestamp: Date.now(),
+    };
+
+    addEntry(entryData);
+    setEntries(getEntries());
+    window.dispatchEvent(new Event('storage-update'));
+    clearForm();
+  };
+
   const totals = calculateSessionTotals(entries, fuel);
+  const owe = parseFloat(customerOwe) || 0;
+  const paid = parseFloat(customerPaid) || 0;
+  const cashTipFromPayment = hasCashPayment && paid > owe ? paid - owe : 0;
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -58,79 +94,189 @@ export function Home() {
           </button>
         </div>
 
-        {/* Quick Actions */}
+        {/* Quick Action Buttons */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           <button
-            onClick={() => navigate('/entry/new')}
-            className="bg-orange-600 hover:bg-orange-700 p-4 rounded-xl transition-colors flex items-center justify-center gap-2"
+            onClick={() => navigate('/fuel')}
+            className="bg-gray-800 hover:bg-gray-700 p-4 rounded-xl transition-colors flex items-center justify-center gap-2"
           >
-            <Plus size={20} />
-            <span className="font-semibold">New Entry</span>
+            <Fuel size={20} />
+            <span className="font-semibold">Fuel</span>
           </button>
           <button
             onClick={() => navigate('/entries')}
             className="bg-gray-800 hover:bg-gray-700 p-4 rounded-xl transition-colors flex items-center justify-center gap-2"
           >
             <ListOrdered size={20} />
-            <span className="font-semibold">View Entries ({entries.length})</span>
+            <span className="font-semibold">Entries ({entries.length})</span>
           </button>
         </div>
 
-        {/* Fuel Section */}
+        {/* Delivery Entry Form */}
         <div className="bg-gray-900 rounded-2xl p-6 mb-6 border border-gray-800">
-          <div className="flex items-center gap-2 mb-4">
-            <Fuel className="text-orange-500" size={20} />
-            <h2 className="font-semibold">Fuel Expenses</h2>
+          <h2 className="font-semibold text-lg mb-4">New Delivery</h2>
+
+          {/* SPay Income */}
+          <div className="mb-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Wallet className="text-orange-500" size={18} />
+              <label className="text-sm font-medium text-gray-400">SPay Income</label>
+            </div>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">Rp</span>
+              <input
+                type="number"
+                value={spayIncome}
+                onChange={(e) => setSpayIncome(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent text-white"
+                placeholder="0"
+                step="0.01"
+              />
+            </div>
           </div>
 
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">
-                Fuel Cost per Litre
+          {/* Cash Payment Helper */}
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Banknote className="text-orange-500" size={18} />
+                <label className="text-sm font-medium text-gray-400">Cash Payment</label>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={hasCashPayment}
+                  onChange={(e) => setHasCashPayment(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-orange-600 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
               </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">Rp</span>
-                <input
-                  type="number"
-                  value={fuel.costPerLitre || ''}
-                  onChange={(e) => updateFuel({ costPerLitre: parseFloat(e.target.value) || 0 })}
-                  className="w-full pl-10 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent text-white"
-                  placeholder="0.00"
-                  step="0.01"
-                />
-              </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">
-                  Distance (km)
-                </label>
-                <input
-                  type="number"
-                  value={fuel.distance || ''}
-                  onChange={(e) => updateFuel({ distance: parseFloat(e.target.value) || 0 })}
-                  className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent text-white"
-                  placeholder="0"
-                  step="0.1"
-                />
-              </div>
+            {hasCashPayment && (
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Customer Owe</label>
+                    <div className="relative">
+                      <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 text-sm">Rp</span>
+                      <input
+                        type="number"
+                        value={customerOwe}
+                        onChange={(e) => setCustomerOwe(e.target.value)}
+                        className="w-full pl-8 pr-2 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent text-white text-sm"
+                        placeholder="0"
+                        step="0.01"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Customer Paid</label>
+                    <div className="relative">
+                      <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 text-sm">Rp</span>
+                      <input
+                        type="number"
+                        value={customerPaid}
+                        onChange={(e) => setCustomerPaid(e.target.value)}
+                        className="w-full pl-8 pr-2 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent text-white text-sm"
+                        placeholder="0"
+                        step="0.01"
+                      />
+                    </div>
+                  </div>
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">
-                  Average km/L
-                </label>
-                <input
-                  type="number"
-                  value={fuel.kmPerL || ''}
-                  onChange={(e) => updateFuel({ kmPerL: parseFloat(e.target.value) || 0 })}
-                  className="w-full px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent text-white"
-                  placeholder="0"
-                  step="0.1"
-                />
+                {cashTipFromPayment > 0 && (
+                  <div className="bg-green-900/20 border border-green-800/50 rounded-lg p-2">
+                    <span className="text-xs text-green-400 font-medium">
+                      Cash Tip: Rp {cashTipFromPayment.toLocaleString('id-ID')}
+                    </span>
+                  </div>
+                )}
               </div>
-            </div>
+            )}
           </div>
+
+          {/* Separate Tip */}
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Gift className="text-orange-500" size={18} />
+                <label className="text-sm font-medium text-gray-400">Tip</label>
+              </div>
+              {!hasSeparateTip && (
+                <button
+                  onClick={() => setHasSeparateTip(true)}
+                  className="w-10 h-10 bg-orange-600 hover:bg-orange-700 rounded-full transition-colors flex items-center justify-center shadow-lg active:scale-95"
+                  aria-label="Add Tip"
+                >
+                  <Plus size={20} strokeWidth={3} />
+                </button>
+              )}
+            </div>
+
+            {hasSeparateTip && (
+              <div className="space-y-3">
+                <div>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">Rp</span>
+                    <input
+                      type="number"
+                      value={separateTipAmount}
+                      onChange={(e) => setSeparateTipAmount(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent text-white"
+                      placeholder="0"
+                      step="0.01"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <label className="flex-1 cursor-pointer">
+                    <input
+                      type="radio"
+                      checked={separateTipType === 'cash'}
+                      onChange={() => setSeparateTipType('cash')}
+                      className="sr-only peer"
+                    />
+                    <div className="p-2.5 bg-gray-800 border-2 border-gray-700 rounded-lg text-center peer-checked:border-orange-600 peer-checked:bg-orange-900/20 transition-colors">
+                      <span className="text-sm font-medium">Cash</span>
+                    </div>
+                  </label>
+                  <label className="flex-1 cursor-pointer">
+                    <input
+                      type="radio"
+                      checked={separateTipType === 'spay'}
+                      onChange={() => setSeparateTipType('spay')}
+                      className="sr-only peer"
+                    />
+                    <div className="p-2.5 bg-gray-800 border-2 border-gray-700 rounded-lg text-center peer-checked:border-orange-600 peer-checked:bg-orange-900/20 transition-colors">
+                      <span className="text-sm font-medium">SPay</span>
+                    </div>
+                  </label>
+                </div>
+
+                <button
+                  onClick={() => {
+                    setHasSeparateTip(false);
+                    setSeparateTipAmount('');
+                  }}
+                  className="text-xs text-red-400 hover:text-red-300 transition-colors"
+                >
+                  Remove Tip
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Save Button */}
+          <button
+            onClick={handleSaveEntry}
+            className="w-full bg-orange-600 hover:bg-orange-700 p-3 rounded-xl transition-colors flex items-center justify-center gap-2 font-semibold"
+          >
+            <Save size={20} />
+            <span>Save Entry</span>
+          </button>
         </div>
 
         {/* Summary */}
