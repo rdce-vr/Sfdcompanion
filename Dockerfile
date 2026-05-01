@@ -1,19 +1,17 @@
 # Build stage
 FROM node:20-alpine AS builder
 
-WORKDIR /app
-
-# Install pnpm
+WORKDIR /ap# Install pnpm
 RUN npm install -g pnpm@latest
+
+# Copy package files
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 
 # Install dependencies with frozen lockfile
 RUN pnpm install --frozen-lockfile --prefer-offline
 
 # Copy source code
 COPY . .
-
-# Copy package files
-COPY package.json pnpm-workspace.yaml ./
 
 # Build the application
 RUN pnpm run build
@@ -49,6 +47,11 @@ EXPOSE 80
 
 # Use non-root user
 USER nginx
+# Expose port 80
+EXPOSE 80
+Expose port 80
+EXPOSE 80
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]
+", "-g", "daemon off;"]
