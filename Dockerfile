@@ -7,7 +7,7 @@ WORKDIR /app
 RUN npm install -g pnpm@latest
 
 # Copy package files
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml  ./
 
 # Install dependencies with frozen lockfile
 RUN pnpm install --frozen-lockfile --prefer-offline
