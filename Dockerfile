@@ -13,7 +13,7 @@ RUN pnpm install --frozen-lockfile --prefer-offline
 COPY . .
 
 # Copy package files
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY package.json pnpm-workspace.yaml ./
 
 # Build the application
 RUN pnpm run build
