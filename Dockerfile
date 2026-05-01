@@ -4,6 +4,8 @@ FROM node:20-alpine AS builder
 WORKDIR /ap# Install pnpm
 RUN npm install -g pnpm@latest
 
+RUN pnpm install
+
 # Copy package files
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 
