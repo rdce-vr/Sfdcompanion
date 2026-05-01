@@ -49,10 +49,6 @@ EXPOSE 80
 
 # Use non-root user
 USER nginx
-# Expose port 80
-EXPOSE 80
-Expose port 80
-EXPOSE 80
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]
