@@ -6,14 +6,14 @@ WORKDIR /app
 # Install pnpm
 RUN npm install -g pnpm@latest
 
-# Copy package files
-COPY package.json pnpm-workspace.yaml  ./
-
 # Install dependencies with frozen lockfile
 RUN pnpm install --frozen-lockfile --prefer-offline
 
 # Copy source code
 COPY . .
+
+# Copy package files
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 
 # Build the application
 RUN pnpm run build
