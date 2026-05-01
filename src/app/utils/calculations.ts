@@ -44,7 +44,8 @@ export const calculateSessionTotals = (entries: DeliveryEntry[], fuel: FuelData)
   const totalIncome = totalSpayIncome + totalTip;
 
   const litresConsumed = fuel.kmPerL > 0 ? fuel.distance / fuel.kmPerL : 0;
-  const fuelExpense = litresConsumed * fuel.costPerLitre;
+  const fuelExpenseRaw = litresConsumed * fuel.costPerLitre;
+  const fuelExpense = Math.ceil(fuelExpenseRaw/100) * 100
 
   const netEarnings = totalIncome - fuelExpense;
 
