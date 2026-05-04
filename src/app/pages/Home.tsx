@@ -15,6 +15,7 @@ export function Home() {
   const [hasCashPayment, setHasCashPayment] = useState(false);
   const [customerOwe, setCustomerOwe] = useState('');
   const [customerPaid, setCustomerPaid] = useState('');
+  const [cashPaymentNotes, setCashPaymentNotes] = useState('');
   const [hasSeparateTip, setHasSeparateTip] = useState(false);
   const [separateTipAmount, setSeparateTipAmount] = useState('');
   const [separateTipType, setSeparateTipType] = useState<'cash' | 'spay'>('cash');
@@ -42,6 +43,7 @@ export function Home() {
     setHasCashPayment(false);
     setCustomerOwe('');
     setCustomerPaid('');
+    setCashPaymentNotes('');
     setHasSeparateTip(false);
     setSeparateTipAmount('');
     setSeparateTipType('cash');
@@ -54,6 +56,7 @@ export function Home() {
       hasCashPayment,
       customerOwe: parseFloat(customerOwe) || 0,
       customerPaid: parseFloat(customerPaid) || 0,
+      cashPaymentNotes: cashPaymentNotes.trim() || undefined,
       hasSeparateTip,
       separateTipAmount: parseFloat(separateTipAmount) || 0,
       separateTipType,
@@ -193,6 +196,17 @@ export function Home() {
                     </span>
                   </div>
                 )}
+
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Notes (Optional)</label>
+                  <textarea
+                    value={cashPaymentNotes}
+                    onChange={(e) => setCashPaymentNotes(e.target.value)}
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent text-white text-sm resize-none"
+                    placeholder="Add notes about this cash payment..."
+                    rows={2}
+                  />
+                </div>
               </div>
             )}
           </div>
