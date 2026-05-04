@@ -13,6 +13,7 @@ export function EntryDetail() {
   const [hasCashPayment, setHasCashPayment] = useState(false);
   const [customerOwe, setCustomerOwe] = useState('');
   const [customerPaid, setCustomerPaid] = useState('');
+  const [cashPaymentNotes, setCashPaymentNotes] = useState('');
   const [hasSeparateTip, setHasSeparateTip] = useState(false);
   const [separateTipAmount, setSeparateTipAmount] = useState('');
   const [separateTipType, setSeparateTipType] = useState<'cash' | 'spay'>('cash');
@@ -25,6 +26,7 @@ export function EntryDetail() {
         setHasCashPayment(entry.hasCashPayment);
         setCustomerOwe(entry.customerOwe.toString());
         setCustomerPaid(entry.customerPaid.toString());
+        setCashPaymentNotes(entry.cashPaymentNotes || '');
         setHasSeparateTip(entry.hasSeparateTip);
         setSeparateTipAmount(entry.separateTipAmount.toString());
         setSeparateTipType(entry.separateTipType);
@@ -39,6 +41,7 @@ export function EntryDetail() {
       hasCashPayment,
       customerOwe: parseFloat(customerOwe) || 0,
       customerPaid: parseFloat(customerPaid) || 0,
+      cashPaymentNotes: cashPaymentNotes.trim() || undefined,
       hasSeparateTip,
       separateTipAmount: parseFloat(separateTipAmount) || 0,
       separateTipType,
@@ -159,6 +162,19 @@ export function EntryDetail() {
                   </span>
                 </div>
               )}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">
+                  Notes (Optional)
+                </label>
+                <textarea
+                  value={cashPaymentNotes}
+                  onChange={(e) => setCashPaymentNotes(e.target.value)}
+                  className="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent text-white resize-none"
+                  placeholder="Add notes about this cash payment..."
+                  rows={3}
+                />
+              </div>
             </div>
           )}
         </div>
