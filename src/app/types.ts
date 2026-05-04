@@ -4,6 +4,7 @@ export interface DeliveryEntry {
   hasCashPayment: boolean;
   customerOwe: number;
   customerPaid: number;
+  cashPaymentNotes?: string;
   hasSeparateTip: boolean;
   separateTipAmount: number;
   separateTipType: 'cash' | 'spay';
