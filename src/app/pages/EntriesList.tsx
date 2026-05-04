@@ -138,6 +138,13 @@ export function EntriesList() {
                         </div>
                       )}
 
+                      {entry.cashPaymentNotes && (
+                        <div className="mt-3 pt-3 border-t border-gray-800">
+                          <span className="text-xs text-gray-500 block mb-1">Notes:</span>
+                          <p className="text-sm text-gray-300 italic">"{entry.cashPaymentNotes}"</p>
+                        </div>
+                      )}
+
                       <button
                         onClick={() => handleDelete(entry.id)}
                         className="w-full mt-3 p-2 bg-red-900/20 hover:bg-red-900/40 text-red-400 rounded-lg transition-colors flex items-center justify-center gap-2"
