@@ -5,9 +5,14 @@ export const calculateEntryTotals = (entry: DeliveryEntry) => {
   let spayTip = 0;
   let amountToTransfer = 0;
 
-  if (entry.hasCashPayment && entry.customerPaid > entry.customerOwe) {
-    cashTip = entry.customerPaid - entry.customerOwe;
+  // Amount to transfer is always the owe amount when cash payment is used
+  if (entry.hasCashPayment) {
     amountToTransfer = entry.customerOwe;
+
+    // Calculate cash tip if customer paid more than owed
+    if (entry.customerPaid > entry.customerOwe) {
+      cashTip = entry.customerPaid - entry.customerOwe;
+    }
   }
 
   if (entry.hasSeparateTip) {
@@ -44,8 +49,7 @@ export const calculateSessionTotals = (entries: DeliveryEntry[], fuel: FuelData)
   const totalIncome = totalSpayIncome + totalTip;
 
   const litresConsumed = fuel.kmPerL > 0 ? fuel.distance / fuel.kmPerL : 0;
-  const fuelExpenseRaw = litresConsumed * fuel.costPerLitre;
-  const fuelExpense = Math.ceil(fuelExpenseRaw/100) * 100
+  const fuelExpense = litresConsumed * fuel.costPerLitre;
 
   const netEarnings = totalIncome - fuelExpense;
 
