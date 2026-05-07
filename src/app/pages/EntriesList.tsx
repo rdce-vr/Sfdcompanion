@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { ArrowLeft, Plus, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, ChevronDown, ChevronUp, Trash2, Banknote, Gift } from 'lucide-react';
 import { getEntries, deleteEntry } from '../utils/storage';
 import { calculateEntryTotals } from '../utils/calculations';
 import { DeliveryEntry } from '../types';
@@ -69,6 +69,7 @@ export function EntriesList() {
               const totals = calculateEntryTotals(entry);
               const isExpanded = expandedId === entry.id;
               const totalIncome = totals.spayIncome + totals.cashTip + totals.spayTip;
+              const hasTip = totals.cashTip > 0 || totals.spayTip > 0;
 
               return (
                 <div
@@ -82,13 +83,29 @@ export function EntriesList() {
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <span className="text-sm font-semibold text-orange-500">
                             Entry #{entries.length - index}
                           </span>
                           <span className="text-xs text-gray-500">
                             {formatTime(entry.timestamp)}
                           </span>
+
+                          {/* Badges */}
+                          <div className="flex items-center gap-1">
+                            {entry.hasCashPayment && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-900/30 border border-blue-700/50 rounded-full text-xs text-blue-400">
+                                <Banknote size={12} />
+                                <span>Cash</span>
+                              </span>
+                            )}
+                            {hasTip && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-900/30 border border-green-700/50 rounded-full text-xs text-green-400">
+                                <Gift size={12} />
+                                <span>Tip</span>
+                              </span>
+                            )}
+                          </div>
                         </div>
                         <div className="text-lg font-bold">
                           Rp {totalIncome.toLocaleString('id-ID')}
