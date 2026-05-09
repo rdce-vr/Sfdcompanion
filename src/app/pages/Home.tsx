@@ -189,6 +189,16 @@ export function Home() {
                   </div>
                 </div>
 
+                {customerOwe && (
+                  <button
+                    type="button"
+                    onClick={() => setCustomerPaid(customerOwe)}
+                    className="w-full px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded-lg transition-colors"
+                  >
+                    Paid Exact Amount
+                  </button>
+                )}
+
                 {cashTipFromPayment > 0 && (
                   <div className="bg-green-900/20 border border-green-800/50 rounded-lg p-2">
                     <span className="text-xs text-green-400 font-medium">
